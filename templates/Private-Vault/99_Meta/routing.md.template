@@ -130,6 +130,38 @@
 - 已经在写脚本、文案 → **4 Scripts**
 - 别人的金句 / 引用 / 片段素材 → **9 Swipe-File**
 
+## 项目 / Idea 的状态标记规范
+
+对于"需要定期跟进"的笔记（idea、project、watch list、待启动项目），写入时在文件顶部加 frontmatter：
+
+```yaml
+---
+status: watching | considering | active | done | abandoned
+priority: low | medium | high
+next-review: YYYY-MM-DD
+review-cadence: weekly | biweekly | monthly | quarterly
+trigger-condition: "什么条件满足后启动 / 放弃"
+created: YYYY-MM-DD
+---
+```
+
+字段语义：
+
+| 字段 | 含义 |
+|---|---|
+| **status** | `watching` = 等外部条件；`considering` = 还在想要不要做；`active` = 正在做；`done`/`abandoned` = 终态 |
+| **priority** | 跟进优先级（不是任务优先级） |
+| **next-review** | 下次该再看一眼的日期 |
+| **review-cadence** | 复查节奏，weekly review 时按这个节奏自动扫描 |
+| **trigger-condition** | 什么条件满足后把 status 改成 `active` |
+| **created** | 创建日期，方便回顾"这事躺多久了" |
+
+适用范围：规则 3（Ideas）、15（工作项目）、18（Areas）下的"项目/idea 类"笔记。
+**纯知识笔记不需要**（如 `70_Areas/ai-systems/attention-notes.md` 不需要 status）。
+
+聚合视图维护在 `99_Meta/watch-list.md`（手动维护或用 Dataview 自动化）。
+每次 weekly / biweekly review 时扫一遍 watch-list，决定哪些状态要变化。
+
 ## slug 规则
 
 - 中文转拼音首字母 + 英文原样；空格转 `-`；全小写

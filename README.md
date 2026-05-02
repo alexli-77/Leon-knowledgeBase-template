@@ -30,7 +30,8 @@ PARA 变体 + 数字前缀 + MOC 文件 + 路由规则 + `/record` skill，让"�
 │   ├── 90_Resources/       ← 可复用资源
 │   ├── 95_Archive/         ← 归档
 │   └── 99_Meta/            ← 元数据
-│       └── routing.md      ← /record 的路由规则
+│       ├── routing.md      ← /record 的路由规则
+│       └── watch-list.md   ← 待跟进事项总览（status 字段聚合视图）
 └── Public-Vault/           ← 公开区（博客、论文笔记）
 ```
 
@@ -75,6 +76,31 @@ git clone <this-repo> && cd leon-knowledgeBase-template
 - `routing.md = 唯一真源`（规则变了只改一处）
 - `/record 是显式触发`（不猜测、不打扰）
 - **Inbox 兜底**（匹配不上就扔 Inbox，周日整理）
+- **状态作为正交维度**（按内容分目录，按 `status` frontmatter 聚合到 `watch-list.md`）
+
+## 处理"需要定期跟进"的事情
+
+知识库目录是按**内容性质**分（PhD / Content / Hobby ...），但有些笔记需要的是**按状态**管理：
+等条件触发的项目想法、还没决定要不要做的副业、watching 的开源项目 ...
+
+这套模板用 frontmatter 解决：
+
+```yaml
+---
+status: watching | considering | active | done | abandoned
+priority: low | medium | high
+next-review: YYYY-MM-DD
+review-cadence: weekly | biweekly | monthly | quarterly
+trigger-condition: "什么条件满足后启动"
+created: YYYY-MM-DD
+---
+```
+
+笔记照旧按内容写到对应目录（如 `70_Areas/{领域}/` 或 `50_Content/Ideas/`），
+然后把 link 同步到 `99_Meta/watch-list.md` 的对应栏目。
+
+每次 weekly review 时扫一遍 watch-list，决定状态变化。
+完整规范见 `templates/Private-Vault/99_Meta/routing.md.template` 的"项目 / Idea 的状态标记规范"章节。
 
 ## License
 

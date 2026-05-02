@@ -1,0 +1,52 @@
+---
+用途: 集中管理"需要定期跟进"的笔记
+最后更新: YYYY-MM-DD
+review-频率: 每周 weekly review 时扫一遍
+---
+
+# Watch List
+
+> 这份文件是带 `status` 字段的笔记的总览。每次 weekly / biweekly review 时扫一遍：
+> - `next-review <= 今天` 的条目逐一回看
+> - 决定 status 是否要从 watching → active / abandoned
+> - 触发条件已满足的，move 到 Active
+
+## 🔭 Watching（等条件触发）
+
+| 笔记 | 触发条件 | 下次 review | 优先级 |
+|---|---|---|---|
+| _(no entries yet)_ | | | |
+
+## 🤔 Considering（还在想要不要做）
+
+| 笔记 | 关键决策点 | 下次 review | 优先级 |
+|---|---|---|---|
+| _(no entries yet)_ | | | |
+
+## 🚀 Active（正在做）
+
+_(none)_
+
+## ✅ Done
+
+_(none)_
+
+## ❌ Abandoned
+
+_(none)_
+
+---
+
+## 维护规则
+
+- 创建带 `status` 字段的笔记时，把 link 同步加到这里对应栏目
+- review 时改 status，把 link 移到对应栏目（不删行，只移）
+- 终态（done / abandoned）的条目保留 1-3 个月再清理
+- 想给所有带 status 的笔记自动生成视图 → 在 Obsidian 装 Dataview，用类似查询：
+
+```dataview
+TABLE status, next-review, priority
+FROM "70_Areas" or "50_Content/Ideas" or "30_Work"
+WHERE status
+SORT next-review ASC
+```
