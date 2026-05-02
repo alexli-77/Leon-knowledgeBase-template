@@ -1,0 +1,113 @@
+---
+用途: /record skill 路由知识库条目时使用的规则手册
+最后更新: YYYY-MM-DD
+---
+
+# Vault 路由规则
+
+> `/record <内容>` 会读这份文件来决定把内容写到哪里。
+> 规则变了，只改这一份。
+
+## 根路径
+
+`{{VAULT_ROOT}}`
+
+> setup.sh 会自动替换上面的占位符。如果是手动部署，把 `{{VAULT_ROOT}}`
+> 改成你本地 Private-Vault 的绝对路径。
+
+## 路由表（按优先级从上到下匹配）
+
+| # | 触发信号（关键词/内容特征） | 目标目录 | 文件名规则 | 写入方式 |
+|---|---|---|---|---|
+| 1 | 用户明确说"记到 daily / 写到日记 / 今日总结" | `10_Daily/` | `YYYY-MM-DD.md` | 追加到对应 section |
+| 2 | 爱好相关（Training/Match/Gear 等） | `60_Hobby/<子目录>/` | 按子目录命名规则 | 同日追加或新建 |
+| 3 | 选题、内容 idea | `50_Content/Ideas/` | `idea-{slug}.md` | 新建 |
+| 4 | 视频脚本、文案草稿 | `50_Content/Scripts/` | `{slug}.md` | 新建 |
+| 5 | 已发布内容复盘 | `50_Content/Published/` | `YYYY-MM-DD-{slug}.md` | 新建 |
+| 6 | 同行博主观察 | 追加到 `50_Content/Channel/competitors.md` | — | 追加 |
+| 7 | 频道战略调整 | 追加到 `50_Content/Channel/strategy.md` | — | 追加 |
+| 8 | 内容支柱调整 | 追加到 `50_Content/Channel/content-pillars.md` | — | 追加 |
+| 9 | 金句、灵感片段 | `50_Content/Swipe-File/` | `swipe-{slug}.md` | 新建 |
+| 10 | 观众评论、读者问题 | `50_Content/Comments/` | `YYYY-MM-DD-{slug}.md` | 新建 |
+| 11 | 导师/上级会议 | `20_PhD/Advisor-Meetings/`（或你的 Main 子目录） | `YYYY-MM-DD-meeting.md` | 同日追加 |
+| 12 | 研究日志、实验想法 | `20_PhD/Research-Logs/` | `YYYY-MM-DD-{topic-slug}.md` | 新建 |
+| 13 | 论文草稿 | `20_PhD/Drafts/` | `{paper-slug}.md` | 新建 |
+| 14 | 答辩/汇报准备 | `20_PhD/Defense/` | `{topic-slug}.md` | 新建 |
+| 15 | 工作项目 | `30_Work/Projects/{project-slug}/` | `YYYY-MM-DD-{slug}.md` | 新建 |
+| 16 | 具体的人、朋友、合作者 | `80_People/` | `{name-slug}.md` | 同名追加 |
+| 17 | 客户（敏感） | `80_People/` | `client-C-YYYY-NNN.md` | 新建 |
+| 18 | 长期兴趣领域笔记 | `70_Areas/{领域-slug}/` | `{topic-slug}.md` | 新建 |
+| 19 | 可复用资源、工具、指南 | `90_Resources/` | `{topic-slug}.md` | 新建 |
+| 20 | 已完成/过期项目归档 | `95_Archive/` | 保留原路径结构 | 手动触发 |
+| 21 | 其它无法归类 | `00_Inbox/` | `YYYY-MM-DD-{slug}.md` + `#待整理` | 新建（兜底） |
+
+## Daily 模板 section 对应表
+
+当用户明确说"记到 daily"时，`10_Daily/YYYY-MM-DD.md` 的 section 路由：
+
+| 内容类型 | Section |
+|---|---|
+| 今天的三件重点 | `## 🎯 今日三件事` |
+| 主业/PhD | `## 📝 Main` |
+| 副业应用 | `## 💻 Apps` |
+| 自媒体内容 | `## 🎬 Content` |
+| 爱好 | `## 🏸 Hobby` |
+| 身体/健康 | `## 🩺 Body` |
+| 杂感、随想 | `## 💭 Random Thoughts` |
+
+若当日文件不存在，按如下骨架创建：
+
+```markdown
+# YYYY-MM-DD
+
+## 🎯 今日三件事
+-
+
+## 📝 Main
+-
+
+## 💻 Apps
+-
+
+## 🎬 Content
+-
+
+## 🏸 Hobby
+-
+
+## 🩺 Body
+-
+
+## 💭 Random Thoughts
+-
+```
+
+## 写入格式
+
+每条记录前加时间戳：`- [HH:MM] <内容>`
+
+长内容（>3 行或包含代码块）用以下结构：
+
+```markdown
+## [HH:MM] <标题>
+
+<正文>
+```
+
+## 歧义处理
+
+以下情形必须先问用户再写：
+
+1. 同一条内容同时匹配 ≥2 条规则
+2. 需要指定人名/项目名但用户没给
+3. 规则 17 的客户代号需要新分配顺序号时
+
+## slug 规则
+
+- 中文转拼音首字母 + 英文原样；空格转 `-`；全小写
+- 最多 6 个词
+
+## 维护
+
+- 新增子目录或调整规则时，**只改这份文件**，不改 SKILL.md
+- 发现规则冲突或频繁走 Inbox → 说明规则不够，补一条

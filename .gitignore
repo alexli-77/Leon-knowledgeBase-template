@@ -1,0 +1,43 @@
+# === Obsidian / macOS 产物 ===
+.DS_Store
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.smart-env/
+.trash/
+
+# === 用户私人内容：模板本身不应含这些；fork 后写在这的内容也不会被 push ===
+# 如果你在 clone 下来的 repo 里直接写笔记（不推荐，建议 setup.sh 部署到别处）
+Private-Vault/00_Inbox/*
+!Private-Vault/00_Inbox/_MOC.md
+
+Private-Vault/10_Daily/*
+!Private-Vault/10_Daily/_MOC.md
+
+Private-Vault/20_PhD/**/*.md
+!Private-Vault/20_PhD/**/_MOC.md
+
+Private-Vault/30_Work/**/*.md
+!Private-Vault/30_Work/**/_MOC.md
+
+Private-Vault/40_Apps/**/*.md
+!Private-Vault/40_Apps/**/_MOC.md
+
+Private-Vault/50_Content/Ideas/*
+Private-Vault/50_Content/Scripts/*
+Private-Vault/50_Content/Published/*
+Private-Vault/50_Content/Swipe-File/*
+Private-Vault/50_Content/Comments/*
+
+Private-Vault/60_Hobby/**/*.md
+!Private-Vault/60_Hobby/**/_MOC.md
+
+Private-Vault/70_Areas/**/*.md
+!Private-Vault/70_Areas/**/_MOC.md
+
+Private-Vault/80_People/*
+!Private-Vault/80_People/_MOC.md
+
+Private-Vault/90_Resources/**/*.md
+!Private-Vault/90_Resources/**/_MOC.md
+
+Private-Vault/95_Archive/**
