@@ -102,6 +102,23 @@ created: YYYY-MM-DD
 每次 weekly review 时扫一遍 watch-list，决定状态变化。
 完整规范见 `templates/Private-Vault/99_Meta/routing.md.template` 的"项目 / Idea 的状态标记规范"章节。
 
+## 配套 skill 推荐
+
+这个模板可以独立使用——只要你想要一个"按 PARA 组织 + `/record` 一键归档"的 Obsidian 知识库就够了。
+
+如果你也用 Claude Code 做 OKR / 周计划复盘，下面这个 skill 直接配套：
+
+> **[life-review-os](https://github.com/alexli-77/life-review-os)** — Life Review OS
+>
+> 把"周计划 / 双周复盘 / 季末方向校准"做成自动化流程的 Claude Skill。
+> 读取你的飞书 Weekly 文档，对比计划与执行，生成下周计划，自动写回飞书。
+>
+> 启用 vault 联动后，会把以下两类信息存到本模板的 `99_Meta/` 下：
+> - **watch-list 决策**（每次 review 时基于 frontmatter 状态自动扫描）
+> - **OKR metadata**（deadline / phantom 状态等结构化补全，自动写入 `99_Meta/okr-metadata.yaml`）
+>
+> 不绑定本模板——任何 markdown 笔记目录都能作为 vault。这里只是"已经有完整 PARA 结构 + watch-list dataview 视图"的开箱即用选择。
+
 ## License
 
 MIT。随便用、改、分发。
