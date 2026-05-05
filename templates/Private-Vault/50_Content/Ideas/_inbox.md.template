@@ -1,0 +1,58 @@
+---
+用途: ideas 集中区——未成型的想法、视频点子、产品 idea
+status: active
+review-cadence: monthly
+next-review: YYYY-MM-DD
+created: YYYY-MM-DD
+最后更新: YYYY-MM-DD
+---
+
+# 💡 Ideas Inbox
+
+> 短想法直接写这里。当某条 idea 准备详细展开（写脚本、做 PoC、调研）时，
+> 拆成独立笔记 `50_Content/Ideas/idea-{slug}.md`，并把 inbox 里的条目搬到
+> 下方"已升级"段，保留 wiki link。
+>
+> 整个文件每月 review 一次（next-review 字段触发）。到期会出现在
+> [[../../99_Meta/watch-list]] 的"到期未处理"视图里。
+>
+> review 时三种决策：
+> - 🌱 → 🌱（继续发酵）：不动，但 next-review 推迟一个月
+> - 🌱 → 🌳（拆为独立笔记）：cp 到 idea-{slug}.md，本文件这条挪到下方"已升级"段
+> - 🌱 → 🪦（放弃）：挪到下方"已放弃"段，加放弃日期 + 一句原因
+>
+> 每条 idea 的最小结构（H3 标题 + 元信息行 + 1-2 句描述）：
+>
+> ```
+> ### 一句话标题
+> [YYYY-MM-DD] | 类型（工具 / 产品 / 视频 / 文章 / 工作流）
+> 描述要解决什么 / 是什么场景。
+> ```
+
+---
+
+## 🌱 待发酵
+
+### (示例) 做一个工具：自动生成视频字幕
+[YYYY-MM-DD] | 工具
+跨平台支持中英双语，集成主流视频格式。
+
+### (示例) 产品想法：番茄钟 + 习惯追踪
+[YYYY-MM-DD] | 产品
+把 pomodoro 和 habit tracker 整合，专注同时积累习惯连续天数。
+
+### (示例) 视频选题：从工程师视角看 AI 浪潮
+[YYYY-MM-DD] | 视频
+拆为系列，每期一个具体技术点 + 商业影响分析。
+
+---
+
+## 🌳 已升级为独立笔记
+
+- [[idea-example]] — 示例升级 idea (YYYY-MM-DD)
+
+---
+
+## 🪦 已放弃
+
+(空)
