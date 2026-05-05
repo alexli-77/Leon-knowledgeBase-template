@@ -21,7 +21,8 @@
 |---|---|---|---|---|
 | 1 | 用户明确说"记到 daily / 写到日记 / 今日总结" | `10_Daily/` | `YYYY-MM-DD.md` | 追加到对应 section |
 | 2 | 爱好相关（Training/Match/Gear 等） | `60_Hobby/<子目录>/` | 按子目录命名规则 | 同日追加或新建 |
-| 3 | 选题、内容 idea | `50_Content/Ideas/` | `idea-{slug}.md` | 新建 |
+| 3 | 选题、内容 idea（短想法）| 追加到 `50_Content/Ideas/_inbox.md` 的 🌱 待发酵 段 | — | 追加（H3 + `[YYYY-MM-DD] \| 类型`）|
+| 3b | 已成型的 idea（要展开做 PoC / 写脚本 / 调研）| `50_Content/Ideas/` | `idea-{slug}.md` | 新建（同时把 _inbox.md 的对应条目搬到 🌳 已升级 段，保留 wiki link）|
 | 4 | 视频脚本、文案草稿 | `50_Content/Scripts/` | `{slug}.md` | 新建 |
 | 5 | 已发布内容复盘 | `50_Content/Published/` | `YYYY-MM-DD-{slug}.md` | 新建 |
 | 6 | 同行博主观察 | 追加到 `50_Content/Channel/competitors.md` | — | 追加 |
@@ -124,11 +125,14 @@
 - 自己思考、实验、阅读论文产生的想法 → **12**（研究日志）
 - 同一条内容跨两者 → 写到 11，在 12 加一条 link
 
-### 3 (Ideas) vs 4 (Scripts) vs 9 (Swipe-File)
+### 3 / 3b (Ideas) vs 4 (Scripts) vs 9 (Swipe-File)
 
-- 还没成型的想法、选题 → **3 Ideas**
+- 还没成型的想法、选题 → **3**（追加到 `_inbox.md` 🌱 段）
+- 想认真做、需要 PoC / 写脚本 / 调研 → **3b**（独立 `idea-{slug}.md`）
 - 已经在写脚本、文案 → **4 Scripts**
 - 别人的金句 / 引用 / 片段素材 → **9 Swipe-File**
+
+> Idea 的生命周期：先进 _inbox.md（每月 review 一次），长大了升级为独立笔记。
 
 ## 项目 / Idea 的状态标记规范
 
