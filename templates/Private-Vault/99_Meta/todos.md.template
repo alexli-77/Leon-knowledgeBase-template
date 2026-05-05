@@ -1,0 +1,35 @@
+---
+用途: 小颗粒待办事项；非 OKR 推进项
+最后更新: YYYY-MM-DD
+---
+
+# Todos
+
+> 这里只放**OKR 之外的小颗粒待办**——续会员 / 寄东西 / 买物品 / 短链接 / follow-up
+> 之类。值得做成 KR 或要务的事去你的主项目跟踪文档（飞书 / Notion / Jira 等），不在这。
+>
+> 配套 [life-review-os](https://github.com/alexli-77/life-review-os) skill 时，
+> weekly review 会读这个文件，把逾期 / urgent 的项作为背景列出来，最多折入
+> 2 条到下周"如有余力"。skill 不会修改这个文件，归档由你手动。
+>
+> 标签语法（inline，可叠加）：
+> - `[DDL: YYYY-MM-DD]` — 截止日
+> - `[urgent]` — 主动标紧急
+> - `[blocked: 原因]` — 卡住，不主动建议
+> - `[parked]` — 主动延后到下次 review
+> - `[study]` — 学习类（书 / 算法 / 文章），区别于动手类
+> - `[done: YYYY-MM-DD]` — 完成日期
+
+## 🔴 Open
+
+<!-- 当前需要做但还没做的小事 -->
+
+- [ ]
+
+## ✅ Done (last 7 days)
+
+<!-- 完成后挪到这里，或直接改 [x]。超过 7 天的可以删掉或挪到 done.md -->
+
+## 🅿️ Parked
+
+<!-- 主动延后的事，每月 review 一次 -->

@@ -29,9 +29,12 @@ PARA 变体 + 数字前缀 + MOC 文件 + 路由规则 + `/record` skill，让"�
 │   ├── 80_People/          ← 人际 CRM
 │   ├── 90_Resources/       ← 可复用资源
 │   ├── 95_Archive/         ← 归档
-│   └── 99_Meta/            ← 元数据
+│   └── 99_Meta/            ← 元数据 + 管理工具
 │       ├── routing.md      ← /record 的路由规则
-│       └── watch-list.md   ← 待跟进事项总览（status 字段聚合视图）
+│       ├── watch-list.md   ← 待跟进事项总览（status 字段聚合视图）
+│       ├── todos.md        ← 小颗粒待办（OKR 之外的小事）
+│       ├── done.md         ← 已完成事项归档（按月分段）
+│       └── subscriptions.md ← 订阅追踪（付费服务、到期日）
 └── Public-Vault/           ← 公开区（博客、论文笔记）
 ```
 
