@@ -1,92 +1,94 @@
 # Leon Knowledge Base Template
 
-一个基于 **Obsidian + Claude Code** 的个人知识库模板。
-PARA 变体 + 数字前缀 + MOC 文件 + 路由规则 + `/record` skill，让"把东西记下来"变成一句指令。
+[English](README.md) | [中文](README.zh.md)
 
-## 这个 repo 给谁用
+A personal knowledge-base template built on **Obsidian + Claude Code**.
+PARA variant + numeric prefixes + MOC files + routing rules + a `/record` skill — making "write it down" a one-line command.
 
-适合：
-- 用 Obsidian 管理长期知识的人
-- 用 Claude Code 当工作台的人
-- 想让"记录"零摩擦的人（一句话 `/record xxx`，自动归到正确文件夹）
+## Who this repo is for
 
-不适合：
-- 只想要笔记模板、不想折腾 Claude Code 的人（可以只用 `templates/Private-Vault` 部分）
+A good fit if:
+- You use Obsidian for long-term knowledge
+- You use Claude Code as your workstation
+- You want zero-friction capture (one line `/record xxx` → auto-filed in the right folder)
 
-## 架构一览
+Not for you if:
+- You just want a notes template and don't want to touch Claude Code (you can still use the `templates/Private-Vault` portion alone)
+
+## Architecture at a glance
 
 ```
-你的 Vault/
-├── Private-Vault/          ← 个人区，不 push
-│   ├── 00_Inbox/           ← 收集箱
-│   ├── 10_Daily/           ← 每日记录
-│   ├── 20_PhD/             ← 博士相关（或替换成你的主业）
-│   ├── 30_Work/            ← 工作/业务
-│   ├── 40_Apps/            ← 副业应用
-│   ├── 50_Content/         ← 自媒体内容工坊
-│   ├── 60_Hobby/           ← 爱好（运动/游戏/音乐等）
-│   ├── 70_Areas/           ← 长期关注的领域
-│   ├── 80_People/          ← 人际 CRM
-│   ├── 90_Resources/       ← 可复用资源
-│   ├── 95_Archive/         ← 归档
-│   └── 99_Meta/            ← 元数据 + 管理工具
-│       ├── routing.md      ← /record 的路由规则
-│       ├── watch-list.md   ← 待跟进事项总览（status 字段聚合视图）
-│       ├── todos.md        ← 小颗粒待办（OKR 之外的小事）
-│       ├── done.md         ← 已完成事项归档（按月分段）
-│       └── subscriptions.md ← 订阅追踪（付费服务、到期日）
-└── Public-Vault/           ← 公开区（博客、论文笔记）
+Your Vault/
+├── Private-Vault/          ← personal, not pushed
+│   ├── 00_Inbox/           ← inbox / capture
+│   ├── 10_Daily/           ← daily notes
+│   ├── 20_PhD/             ← PhD-related (or replace with your main work)
+│   ├── 30_Work/            ← work / business
+│   ├── 40_Apps/            ← side-project apps
+│   ├── 50_Content/         ← content / publishing workshop
+│   ├── 60_Hobby/           ← hobbies (sports / games / music / etc.)
+│   ├── 70_Areas/           ← long-term areas of focus
+│   ├── 80_People/          ← personal CRM
+│   ├── 90_Resources/       ← reusable resources
+│   ├── 95_Archive/         ← archive
+│   └── 99_Meta/            ← metadata + management
+│       ├── routing.md      ← routing rules for /record
+│       ├── watch-list.md   ← follow-up overview (aggregates by `status` field)
+│       ├── todos.md        ← small-grain todos (outside OKR scope)
+│       ├── done.md         ← archived done items (segmented by month)
+│       └── subscriptions.md ← subscription tracking (paid services, expiry dates)
+└── Public-Vault/           ← public area (blog, paper notes)
 ```
 
-核心联动：
+How the pieces connect:
 
-1. **`99_Meta/routing.md`** — 把"关键词/内容特征"映射到"该写到哪个文件"
-2. **`~/.claude/skills/record/SKILL.md`** — Claude Code 全局 skill，收到 `/record <内容>` 时读 routing.md 再决定写入位置
-3. **调整规则只改 routing.md**，skill 每次都现读，无需修改代码
+1. **`99_Meta/routing.md`** — maps "keywords / content features" to "which file this should go in"
+2. **`~/.claude/skills/record/SKILL.md`** — Claude Code global skill; on `/record <content>` it reads routing.md, then decides where to write
+3. **Change rules by editing `routing.md` only** — the skill re-reads it every time, no code changes needed
 
-## 快速开始
+## Quick start
 
 ```bash
 # 1. clone
 git clone <this-repo> && cd leon-knowledgeBase-template
 
-# 2. 部署到你的位置（默认 ~/ObsidianVault）
+# 2. Deploy to your location (default ~/ObsidianVault)
 ./setup.sh ~/ObsidianVault
 
-# 3. 安装 /record skill（需要 Claude Code）
+# 3. Install the /record skill (requires Claude Code)
 ./setup.sh --install-skill
 
-# 4. 用 Obsidian 打开两个 Vault
-# 5. 在 Claude Code 里试一条
-/record 今天学会了 X
+# 4. Open both Vaults in Obsidian
+# 5. Try it in Claude Code
+/record Learned X today
 ```
 
-## 关于原作者
+## About the original author
 
-这个模板是 Leon（加拿大蒙特利尔大学 CS PhD 在读）从自己 vault 提炼出的骨架。原 vault 中一些子目录带有个人色彩：
+This template is the skeleton Leon (CS PhD candidate at Université de Montréal) extracted from his own vault. Some sub-folders in the original vault are personal:
 
-- `20_PhD` — 作者是博士，保留了 Research-Logs / Advisor-Meetings / Drafts / Defense。非学术用户可以改成 `20_Main`（主业）或删除
-- `30_Work` — 原 vault 叫 `30_Injunction-Practice`（作者的法律业务），模板里改成通用的 `30_Work`
-- `60_Hobby` — 原 vault 叫 `60_Badminton`（作者打羽毛球）。改成你的爱好即可
-- `50_Content` — 自媒体工坊，如不做内容创作可直接删
+- `20_PhD` — the author is a PhD student; the original has Research-Logs / Advisor-Meetings / Drafts / Defense. Non-academic users can rename it to `20_Main` (your main work) or delete it.
+- `30_Work` — originally `30_Injunction-Practice` (the author's legal business); generalized to `30_Work` in the template.
+- `60_Hobby` — originally `60_Badminton` (the author plays badminton). Rename it to your own hobby.
+- `50_Content` — content / publishing workshop. Delete if you don't create content.
 
-**模板保留了这些目录是因为骨架（_MOC.md + 路由规则思路）可以迁移。** 直接用还是魔改，看你。
+**These folders are kept because the skeleton (`_MOC.md` + routing-rule logic) transfers well.** Use as-is or remix — up to you.
 
-## 设计原则
+## Design principles
 
-- `folder = where it is`（目录就是分类，别发明复杂的 tag 系统）
-- `_MOC.md = 每个目录的说明书`（未来的你打开目录第一眼看它）
-- `routing.md = 唯一真源`（规则变了只改一处）
-- `/record 是显式触发`（不猜测、不打扰）
-- **Inbox 兜底**（匹配不上就扔 Inbox，周日整理）
-- **状态作为正交维度**（按内容分目录，按 `status` frontmatter 聚合到 `watch-list.md`）
+- `folder = where it is` — folders are the categorization; don't invent complex tag systems
+- `_MOC.md = the manual for each folder` — first thing future-you sees when opening a folder
+- `routing.md = single source of truth` — when rules change, only one file changes
+- `/record is explicit` — no guessing, no interruption
+- **Inbox is the fallback** — if no rule matches, drop in Inbox and process on Sunday
+- **Status as an orthogonal dimension** — group by content in folders, aggregate by `status` frontmatter into `watch-list.md`
 
-## 处理"需要定期跟进"的事情
+## Handling "things that need periodic follow-up"
 
-知识库目录是按**内容性质**分（PhD / Content / Hobby ...），但有些笔记需要的是**按状态**管理：
-等条件触发的项目想法、还没决定要不要做的副业、watching 的开源项目 ...
+Knowledge-base folders are organized by **content type** (PhD / Content / Hobby / ...), but some notes need to be managed **by status**:
+project ideas waiting for a trigger, side businesses you haven't decided to start, open-source projects you're watching ...
 
-这套模板用 frontmatter 解决：
+This template solves it with frontmatter:
 
 ```yaml
 ---
@@ -94,38 +96,38 @@ status: watching | considering | active | done | abandoned
 priority: low | medium | high
 next-review: YYYY-MM-DD
 review-cadence: weekly | biweekly | monthly | quarterly
-trigger-condition: "什么条件满足后启动"
+trigger-condition: "what condition triggers a start"
 created: YYYY-MM-DD
 ---
 ```
 
-笔记照旧按内容写到对应目录（如 `70_Areas/{领域}/` 或 `50_Content/Ideas/`），
-然后把 link 同步到 `99_Meta/watch-list.md` 的对应栏目。
+Notes still go to the content folder they belong to (e.g., `70_Areas/{area}/` or `50_Content/Ideas/`),
+then sync a link to the corresponding section of `99_Meta/watch-list.md`.
 
-每次 weekly review 时扫一遍 watch-list，决定状态变化。
-完整规范见 `templates/Private-Vault/99_Meta/routing.md.template` 的"项目 / Idea 的状态标记规范"章节。
+Each weekly review, scan the watch-list to decide status changes.
+Full spec: see the "Project / Idea status convention" section in `templates/Private-Vault/99_Meta/routing.md.template`.
 
-## 配套 skill 推荐
+## Companion skill
 
-这个模板可以独立使用——只要你想要一个"按 PARA 组织 + `/record` 一键归档"的 Obsidian 知识库就够了。
+This template stands on its own — if all you want is "PARA-organized + `/record` one-shot capture" in Obsidian, you're done.
 
-如果你也用 Claude Code 做 OKR / 周计划复盘，下面这个 skill 直接配套：
+If you also use Claude Code for OKR / weekly review, here's the companion skill:
 
 > **[life-review-os](https://github.com/alexli-77/life-review-os)** — Life Review OS
 >
-> 把"周计划 / 双周复盘 / 季末方向校准"做成自动化流程的 Claude Skill。
-> 读取你的飞书 Weekly 文档，对比计划与执行，生成下周计划，自动写回飞书。
+> A Claude Skill that turns "weekly planning / bi-weekly retro / quarterly direction check" into an automated workflow.
+> Reads your Lark (Feishu) Weekly doc, compares plan vs. actual, generates next week's plan, writes it back.
 >
-> 启用 vault 联动后，会把以下两类信息存到本模板的 `99_Meta/` 下：
-> - **watch-list 决策**（每次 review 时基于 frontmatter 状态自动扫描）
-> - **OKR metadata**（deadline / phantom 状态等结构化补全，自动写入 `99_Meta/okr-metadata.yaml`）
+> With vault integration enabled, it persists two kinds of data into this template's `99_Meta/`:
+> - **watch-list decisions** (auto-scanned by frontmatter status on every review)
+> - **OKR metadata** (deadline / phantom status structured fields, written to `99_Meta/okr-metadata.yaml`)
 >
-> 不绑定本模板——任何 markdown 笔记目录都能作为 vault。这里只是"已经有完整 PARA 结构 + watch-list dataview 视图"的开箱即用选择。
+> Not bound to this template — any markdown notes directory works as a vault. This is just the out-of-the-box option that already has full PARA structure + watch-list dataview view.
 
 ## License
 
-MIT。随便用、改、分发。
+MIT. Use, modify, distribute — freely.
 
-## 改动建议流向
+## Contribution flow
 
-fork 后魔改到你的生活里才是正道。如果你觉得某条 routing 规则或某个 _MOC 写法值得共享，欢迎 PR。
+The right way to use this is to fork and remix into your own life. If a routing rule or `_MOC` pattern turns out to be worth sharing, PR welcome.
