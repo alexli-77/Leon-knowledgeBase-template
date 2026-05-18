@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.example.vault-capture-api</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/env</string>
+    <string>bash</string>
+    <string>-lc</string>
+    <string>set -a; . "$HOME/.vault-gate/vault-gate.env"; set +a; python3 /absolute/path/to/Leon-knowledgeBase-template/optional/vault-gate/capture-api/app.py --host 127.0.0.1 --port 8787</string>
+  </array>
+
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/vault-capture-api.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/vault-capture-api.err.log</string>
+</dict>
+</plist>
+

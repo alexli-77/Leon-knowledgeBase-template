@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.example.vault-curator</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/env</string>
+    <string>bash</string>
+    <string>-lc</string>
+    <string>set -a; . "$HOME/.vault-gate/vault-gate.env"; set +a; python3 /absolute/path/to/Leon-knowledgeBase-template/optional/vault-gate/curator/vault_gate.py edit-request --source scheduler --title "Scheduled curator placeholder" --body "Replace this plist with a real curator command."</string>
+  </array>
+
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>20</integer>
+    <key>Minute</key>
+    <integer>30</integer>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/vault-curator.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/vault-curator.err.log</string>
+</dict>
+</plist>
+

@@ -122,6 +122,24 @@ created: YYYY-MM-DD
 >
 > 不绑定本模板——任何 markdown 笔记目录都能作为 vault。这里只是"已经有完整 PARA 结构 + watch-list dataview 视图"的开箱即用选择。
 
+## 可选：Vault Gate 门禁
+
+如果你的 vault 由一台服务器统一写入，其它设备通过 API / Hermes / Discord 发起写入请求，可以启用可选组件：
+
+```text
+optional/vault-gate/
+```
+
+它提供一个无第三方依赖的参考实现：
+
+- 新内容只追加到 `00_Inbox/Capture`
+- 修改、移动、删除、重写等请求进入 `00_Inbox/Pending-Review`
+- 每次决策写入 `99_Meta/automation-log`
+- 可选开启 git auto-commit
+- 示例配置只使用占位符，真实 token 和本地路径必须放在仓库外
+
+详见 `optional/vault-gate/README.md`。
+
 ## License
 
 MIT。随便用、改、分发。

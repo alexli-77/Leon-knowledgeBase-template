@@ -1,0 +1,48 @@
+# Example policy for a server-side Markdown vault gate.
+# This file is documentation-first. The reference implementation uses env vars
+# for the core paths and enforces the same hard-coded safety rules.
+
+vault:
+  root: "/absolute/path/to/Private-Vault"
+  capture_dir: "00_Inbox/Capture"
+  pending_dir: "00_Inbox/Pending-Review"
+  log_dir: "99_Meta/automation-log"
+
+sources:
+  allowed:
+    - macos
+    - discord
+    - hermes
+    - api
+
+rules:
+  allow_auto_capture:
+    description: "Append-only capture notes are low risk."
+    actions:
+      - capture
+    destinations:
+      - "00_Inbox/Capture"
+
+  require_pending_review:
+    description: "Edits, moves, deletes, and rewrites should not auto-apply."
+    actions:
+      - edit
+      - move
+      - delete
+      - rewrite
+    destination: "00_Inbox/Pending-Review"
+
+deny:
+  paths:
+    - ".git"
+    - ".obsidian"
+    - ".trash"
+    - "99_Meta/automation-log"
+  patterns:
+    - "../"
+    - "/"
+
+git:
+  auto_commit: false
+  author: "Vault Gate <vault-gate@example.com>"
+
