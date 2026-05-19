@@ -63,13 +63,39 @@ Use `/capture` for new material. Use `/edit-request` for edits, rewrites, moves,
 
 ## HTTP API
 
-New capture endpoint:
+### Read a file
+
+```text
+GET SERVER_VAULT_GATE_URL/read?path=RELATIVE_PATH
+```
+
+Headers:
+
+```text
+Authorization: Bearer VAULT_GATE_TOKEN
+```
+
+Response (200):
+
+```json
+{
+  "status": "ok",
+  "path": "10_Daily/2026-05-18.md",
+  "content": "# 2026-05-18\n..."
+}
+```
+
+- `RELATIVE_PATH` must be relative to the vault root (e.g. `10_Daily/2026-05-18.md`, `99_Meta/routing.md`).
+- Hidden segments (`.git`, `.obsidian`) and `..` are rejected.
+- Returns 404 if the file does not exist.
+
+### Write new content
 
 ```text
 POST SERVER_VAULT_GATE_URL/capture
 ```
 
-Edit request endpoint:
+### Queue an edit
 
 ```text
 POST SERVER_VAULT_GATE_URL/edit-request

@@ -219,6 +219,23 @@ def capture(config: GateConfig, source: str, title: str, body: str, dry_run: boo
     return GateResult("ok", "captured", rel, run_id, commit)
 
 
+def read_file(config: GateConfig, path: str) -> dict[str, Any]:
+    """Return the raw content of a vault file. Path must be relative to vault root.
+
+    Only regular files are allowed. Hidden/system segments and paths outside
+    the vault root are rejected by safe_join.
+    """
+    ensure_vault_root(config)
+    target = safe_join(config.root, path)
+    if not target.exists():
+        raise GateError(f"file not found: {path}")
+    if not target.is_file():
+        raise GateError(f"path is not a file: {path}")
+    rel = relative_to_root(target, config.root)
+    content = target.read_text(encoding="utf-8")
+    return {"status": "ok", "path": rel, "content": content}
+
+
 def edit_request(config: GateConfig, source: str, title: str, body: str, dry_run: bool = False) -> GateResult:
     ensure_vault_root(config)
     source = validate_source(source)

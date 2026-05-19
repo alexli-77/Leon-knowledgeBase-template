@@ -15,7 +15,7 @@ from pathlib import Path
 CURATOR_DIR = Path(__file__).resolve().parents[1] / "curator"
 sys.path.insert(0, str(CURATOR_DIR))
 
-from vault_gate import GateError, capture, edit_request, load_config  # noqa: E402
+from vault_gate import GateError, capture, edit_request, load_config, read_file  # noqa: E402
 
 
 class VaultGateServer(ThreadingHTTPServer):
@@ -54,6 +54,24 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         if self.path == "/health":
             self.send_json(HTTPStatus.OK, {"status": "ok"})
+            return
+        if self.path.startswith("/read"):
+            if not self.authorized():
+                self.send_json(HTTPStatus.UNAUTHORIZED, {"status": "error", "error": "unauthorized"})
+                return
+            from urllib.parse import parse_qs, urlparse  # stdlib, always available
+            query = parse_qs(urlparse(self.path).query)
+            paths = query.get("path", [])
+            if not paths:
+                self.send_json(HTTPStatus.BAD_REQUEST, {"status": "error", "error": "path query parameter required"})
+                return
+            try:
+                config = load_config()
+                result = read_file(config, paths[0])
+                self.send_json(HTTPStatus.OK, result)
+            except GateError as exc:
+                code = HTTPStatus.NOT_FOUND if "not found" in str(exc) else HTTPStatus.BAD_REQUEST
+                self.send_json(code, {"status": "error", "error": str(exc)})
             return
         self.send_json(HTTPStatus.NOT_FOUND, {"status": "error", "error": "not found"})
 
