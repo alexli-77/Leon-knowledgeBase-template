@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import socketserver
 import sys
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -15,6 +16,14 @@ CURATOR_DIR = Path(__file__).resolve().parents[1] / "curator"
 sys.path.insert(0, str(CURATOR_DIR))
 
 from vault_gate import GateError, capture, edit_request, load_config  # noqa: E402
+
+
+class VaultGateServer(ThreadingHTTPServer):
+    def server_bind(self) -> None:
+        socketserver.TCPServer.server_bind(self)
+        host, port = self.server_address[:2]
+        self.server_name = str(host)
+        self.server_port = int(port)
 
 
 def token() -> str:
@@ -77,7 +86,7 @@ def main() -> int:
     parser.add_argument("--port", type=int, default=8787)
     args = parser.parse_args()
     token()
-    server = ThreadingHTTPServer((args.host, args.port), Handler)
+    server = VaultGateServer((args.host, args.port), Handler)
     print(f"Vault Gate API listening on http://{args.host}:{args.port}", flush=True)
     server.serve_forever()
     return 0
@@ -85,4 +94,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
