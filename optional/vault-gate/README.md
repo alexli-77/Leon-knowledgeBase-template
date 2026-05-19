@@ -58,6 +58,18 @@ Do not solve this with `chmod`. Syncthing folder type and write ownership are th
 
 ## Quick start
 
+For a macOS server, the simplest path is the installer:
+
+```bash
+./optional/vault-gate/install.sh install
+./optional/vault-gate/install.sh status
+./optional/vault-gate/install.sh client-config
+```
+
+`install` creates/updates the private env file, launchd service, runtime directories, and Hermes skill when Hermes is installed. `client-config` prints the URL and bearer token needed by a remote macOS Shortcut.
+
+Manual setup is also possible:
+
 Copy `.env.example` to a private path outside this repo, for example:
 
 ```bash
@@ -137,4 +149,3 @@ Before pushing changes:
 rg -n "token|api[_-]?key|Authorization: Bearer|/Users/|discord" optional/vault-gate
 python3 optional/vault-gate/tests/test_vault_gate.py
 ```
-
