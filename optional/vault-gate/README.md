@@ -84,6 +84,8 @@ echo "Markdown body" | vault-capture "Idea title"
 vault-edit-request "Please reorganize notes about X"
 ```
 
+For detailed command-line, HTTP, curl, Python, Node.js, and long-running service examples, see `CLIENT-USAGE.md`.
+
 Manual setup is also possible:
 
 Copy `.env.example` to a private path outside this repo, for example:
