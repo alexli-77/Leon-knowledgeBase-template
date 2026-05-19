@@ -12,7 +12,7 @@ import sys
 
 sys.path.insert(0, str(ROOT / "curator"))
 
-from vault_gate import GateConfig, GateError, capture, edit_request, safe_join  # noqa: E402
+from vault_gate import GateConfig, GateError, capture, edit_request, safe_join, write_route  # noqa: E402
 
 
 class VaultGateTests(unittest.TestCase):
@@ -42,7 +42,24 @@ class VaultGateTests(unittest.TestCase):
             with self.assertRaises(GateError):
                 safe_join(Path(tmp).resolve(), ".git/config")
 
+    def test_write_route_appends_to_configured_path(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            config = GateConfig(
+                root=Path(tmp),
+                route_map={"daily": {"mode": "append", "path": "10_Daily/{date}.md"}},
+            )
+            result = write_route(config, "discord", "daily", "Today", "Worked on routing")
+            self.assertEqual(result.decision, "routed-write")
+            target = Path(tmp) / result.path
+            self.assertTrue(target.exists())
+            self.assertIn("Worked on routing", target.read_text(encoding="utf-8"))
+
+    def test_write_route_rejects_unknown_route(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            config = GateConfig(root=Path(tmp), route_map={"daily": "10_Daily/{date}.md"})
+            with self.assertRaises(GateError):
+                write_route(config, "discord", "unknown", "Title", "Body")
+
 
 if __name__ == "__main__":
     unittest.main()
-

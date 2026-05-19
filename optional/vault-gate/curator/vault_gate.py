@@ -14,10 +14,13 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
 DENIED_PARTS = {".git", ".obsidian", ".trash", ".DS_Store"}
 SAFE_SOURCE = re.compile(r"^[A-Za-z0-9_.:-]{1,64}$")
+SAFE_ROUTE = re.compile(r"^[A-Za-z0-9_.:-]{1,64}$")
+SAFE_MODE = {"append", "create", "upsert"}
 
 
 @dataclasses.dataclass(frozen=True)
@@ -26,6 +29,8 @@ class GateConfig:
     capture_dir: str = "00_Inbox/Capture"
     pending_dir: str = "00_Inbox/Pending-Review"
     log_dir: str = "99_Meta/automation-log"
+    timezone: str = "UTC"
+    route_map: dict[str, Any] = dataclasses.field(default_factory=dict)
     auto_commit: bool = False
     author: str = "Vault Gate <vault-gate@example.com>"
 
@@ -51,11 +56,24 @@ def load_config() -> GateConfig:
     if not root_raw:
         raise GateError("VAULT_GATE_ROOT is required")
 
+    routes_raw = os.environ.get("VAULT_GATE_ROUTES_JSON", "").strip()
+    route_map: dict[str, Any] = {}
+    if routes_raw:
+        try:
+            loaded = json.loads(routes_raw)
+            if not isinstance(loaded, dict):
+                raise ValueError("VAULT_GATE_ROUTES_JSON must be a JSON object")
+            route_map = loaded
+        except ValueError as exc:
+            raise GateError(f"invalid VAULT_GATE_ROUTES_JSON: {exc}") from exc
+
     return GateConfig(
         root=Path(root_raw).expanduser().resolve(),
         capture_dir=os.environ.get("VAULT_GATE_CAPTURE_DIR", "00_Inbox/Capture"),
         pending_dir=os.environ.get("VAULT_GATE_PENDING_DIR", "00_Inbox/Pending-Review"),
         log_dir=os.environ.get("VAULT_GATE_LOG_DIR", "99_Meta/automation-log"),
+        timezone=os.environ.get("VAULT_GATE_TIMEZONE", "UTC"),
+        route_map=route_map,
         auto_commit=os.environ.get("VAULT_GATE_AUTO_COMMIT", "false").lower() in {"1", "true", "yes"},
         author=os.environ.get("VAULT_GATE_AUTHOR", "Vault Gate <vault-gate@example.com>"),
     )
@@ -80,6 +98,13 @@ def validate_source(source: str) -> str:
     if not SAFE_SOURCE.match(source):
         raise GateError("source must be 1-64 chars: letters, numbers, dot, colon, dash, underscore")
     return source
+
+
+def validate_route(route: str) -> str:
+    route = route.strip()
+    if not SAFE_ROUTE.match(route):
+        raise GateError("route must be 1-64 chars: letters, numbers, dot, colon, dash, underscore")
+    return route
 
 
 def safe_join(root: Path, relative: str) -> Path:
@@ -136,6 +161,16 @@ def write_unique(path: Path, content: str, dry_run: bool) -> None:
         return
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
+
+
+def append_text(path: Path, content: str, dry_run: bool) -> None:
+    if dry_run:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not path.exists():
+        path.write_text(f"# {path.stem}\n", encoding="utf-8")
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(content)
 
 
 def append_log(config: GateConfig, event: dict[str, Any], dry_run: bool) -> str | None:
@@ -219,6 +254,126 @@ def capture(config: GateConfig, source: str, title: str, body: str, dry_run: boo
     return GateResult("ok", "captured", rel, run_id, commit)
 
 
+def local_now(config: GateConfig) -> dt.datetime:
+    try:
+        zone = ZoneInfo(config.timezone)
+    except ZoneInfoNotFoundError:
+        zone = dt.timezone.utc
+    return dt.datetime.now(zone)
+
+
+def default_route_map() -> dict[str, Any]:
+    return {
+        "daily": {"mode": "append", "path": "10_Daily/{year}/{date}.md"},
+        "ideas": {"mode": "append", "path": "30_Ideas/_inbox.md"},
+        "projects": {"mode": "append", "path": "40_Projects/_inbox.md"},
+        "resources": {"mode": "append", "path": "90_Resources/_inbox.md"},
+        "people": {"mode": "append", "path": "80_People/_inbox.md"},
+        "log": {"mode": "append", "path": "99_Meta/automation-log/{year_month}.md"},
+    }
+
+
+def route_spec(config: GateConfig, route: str) -> dict[str, Any]:
+    routes = config.route_map or default_route_map()
+    spec = routes.get(route)
+    if spec is None:
+        allowed = ", ".join(sorted(routes))
+        raise GateError(f"unknown route: {route}. Allowed routes: {allowed}")
+    if isinstance(spec, str):
+        spec = {"path": spec, "mode": "append"}
+    if not isinstance(spec, dict):
+        raise GateError(f"invalid route spec for {route}")
+    path_template = str(spec.get("path", "")).strip()
+    mode = str(spec.get("mode", "append")).strip().lower()
+    if not path_template:
+        raise GateError(f"route {route} has no path")
+    if mode not in SAFE_MODE:
+        raise GateError(f"route {route} has invalid mode: {mode}")
+    return {"path": path_template, "mode": mode}
+
+
+def render_route_path(config: GateConfig, route: str, title: str, run_id: str) -> str:
+    now = local_now(config)
+    title_slug = slugify(title)
+    values = {
+        "route": route,
+        "title_slug": title_slug,
+        "slug": title_slug,
+        "run_id": run_id,
+        "date": now.strftime("%Y-%m-%d"),
+        "datetime": now.strftime("%Y%m%d-%H%M%S"),
+        "year": now.strftime("%Y"),
+        "month": now.strftime("%m"),
+        "day": now.strftime("%d"),
+        "year_month": now.strftime("%Y-%m"),
+    }
+    return route_spec(config, route)["path"].format(**values)
+
+
+def routed_entry(config: GateConfig, source: str, route: str, title: str, body: str, run_id: str) -> str:
+    now = local_now(config).isoformat(timespec="seconds")
+    heading = title.strip() or f"{route} {now}"
+    return "\n".join(
+        [
+            "",
+            f"## {heading}",
+            "",
+            f"- source: `{source}`",
+            f"- route: `{route}`",
+            f"- created: `{now}`",
+            f"- run_id: `{run_id}`",
+            "",
+            body.rstrip(),
+            "",
+        ]
+    )
+
+
+def write_route(
+    config: GateConfig,
+    source: str,
+    route: str,
+    title: str,
+    body: str,
+    dry_run: bool = False,
+) -> GateResult:
+    ensure_vault_root(config)
+    source = validate_source(source)
+    route = validate_route(route)
+    if not body.strip():
+        raise GateError("body is required")
+
+    run_id = run_id_for(f"{source}:{route}", body)
+    spec = route_spec(config, route)
+    target = safe_join(config.root, render_route_path(config, route, title, run_id))
+    rel = relative_to_root(target, config.root)
+    content = routed_entry(config, source, route, title, body, run_id)
+
+    if spec["mode"] == "append":
+        append_text(target, content, dry_run)
+    elif spec["mode"] == "create":
+        write_unique(target, markdown_doc(title, body, source, "routed", run_id), dry_run)
+    else:
+        if target.exists():
+            append_text(target, content, dry_run)
+        else:
+            write_unique(target, markdown_doc(title, body, source, "routed", run_id), dry_run)
+
+    event = {
+        "run_id": run_id,
+        "decision": "routed-write",
+        "source": source,
+        "route": route,
+        "path": rel,
+        "mode": spec["mode"],
+        "dry_run": dry_run,
+    }
+    log_rel = append_log(config, event, dry_run)
+    commit_paths = [rel] + ([log_rel] if log_rel else [])
+    commit = git_commit(config, f"vault-gate: write {route} {run_id}", dry_run, commit_paths)
+    return GateResult("ok", "routed-write", rel, run_id, commit)
+
+
 def read_file(config: GateConfig, path: str) -> dict[str, Any]:
     """Return the raw content of a vault file. Path must be relative to vault root.
 
@@ -267,6 +422,13 @@ def build_parser() -> argparse.ArgumentParser:
         cmd.add_argument("--body", required=True)
         cmd.add_argument("--dry-run", action="store_true")
 
+    write = sub.add_parser("write")
+    write.add_argument("--source", required=True)
+    write.add_argument("--route", required=True)
+    write.add_argument("--title", default="")
+    write.add_argument("--body", required=True)
+    write.add_argument("--dry-run", action="store_true")
+
     check = sub.add_parser("check-path")
     check.add_argument("--path", required=True)
     return parser
@@ -280,6 +442,8 @@ def main(argv: list[str] | None = None) -> int:
             result = capture(config, args.source, args.title, args.body, args.dry_run)
         elif args.command == "edit-request":
             result = edit_request(config, args.source, args.title, args.body, args.dry_run)
+        elif args.command == "write":
+            result = write_route(config, args.source, args.route, args.title, args.body, args.dry_run)
         else:
             path = safe_join(config.root, args.path)
             result = GateResult("ok", "path-allowed", relative_to_root(path, config.root), "check")

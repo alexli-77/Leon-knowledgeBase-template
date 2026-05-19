@@ -8,6 +8,8 @@ Vault Gate 是一个可选的知识库写入门禁。它适合把 Obsidian/Markd
 - `vault_gate.py` 在服务器本地执行真实写入
 - Hermes/Discord/macOS Shortcut 只是入口，不能绕过门禁直接改 vault
 - Git 负责版本历史，automation log 负责解释每次为什么写入
+- `/write` can write directly to route-approved Markdown files; `/capture`
+  remains available but does not need to be the default intake path.
 
 ## Recommended flow
 
@@ -15,11 +17,13 @@ Vault Gate 是一个可选的知识库写入门禁。它适合把 Obsidian/Markd
 flowchart TD
   A["macOS / Discord / Hermes"] --> B["Capture API"]
   B --> C["Vault Gate policy checks"]
-  C --> D{"Risk"}
-  D -->|"low"| E["Write capture inbox"]
-  D -->|"medium/high"| F["Write pending review"]
+  C --> D{"Decision"}
+  D -->|"routed"| E["Write approved route"]
+  D -->|"capture"| F["Write capture inbox"]
+  D -->|"edit request"| I["Write pending review"]
   E --> G["Append automation log"]
   F --> G
+  I --> G
   G --> H["Optional git commit"]
 ```
 
@@ -137,6 +141,46 @@ curl -s http://127.0.0.1:8787/capture \
   -H "Content-Type: application/json" \
   -d '{"source":"discord","title":"API test","body":"Captured through Vault Gate"}'
 ```
+
+## Routed writes
+
+Use `/write` for new material that should go directly to a route-approved
+Markdown file. Use `/capture` only when you intentionally want an inbox note.
+Use `/edit-request` for edits, rewrites, moves, deletes, merges, or
+reorganizations.
+
+```bash
+curl -s http://127.0.0.1:8787/write \
+  -H "Authorization: Bearer $VAULT_GATE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"source":"discord","route":"daily","title":"Today","body":"Markdown body"}'
+```
+
+Routes are configured with `VAULT_GATE_ROUTES_JSON`. Keep real route config in
+the server environment, not in git.
+
+```bash
+export VAULT_GATE_ROUTES_JSON='{
+  "daily": {"mode": "append", "path": "10_Daily/{year}/{date}.md"},
+  "ideas": {"mode": "append", "path": "30_Ideas/_inbox.md"},
+  "resources": {"mode": "append", "path": "90_Resources/_inbox.md"}
+}'
+```
+
+Supported route modes:
+
+- `append`: create the file if needed, then append a timestamped section.
+- `create`: create a new Markdown file and fail if it already exists.
+- `upsert`: create if missing, append if present.
+
+Supported path placeholders:
+
+- `{route}`
+- `{title_slug}` / `{slug}`
+- `{run_id}`
+- `{date}` as `YYYY-MM-DD`
+- `{datetime}` as `YYYYMMDD-HHMMSS`
+- `{year}`, `{month}`, `{day}`, `{year_month}`
 
 ## Git and logs
 

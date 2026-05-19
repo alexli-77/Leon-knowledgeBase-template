@@ -15,7 +15,7 @@ from pathlib import Path
 CURATOR_DIR = Path(__file__).resolve().parents[1] / "curator"
 sys.path.insert(0, str(CURATOR_DIR))
 
-from vault_gate import GateError, capture, edit_request, load_config, read_file  # noqa: E402
+from vault_gate import GateError, capture, edit_request, load_config, read_file, write_route  # noqa: E402
 
 
 class VaultGateServer(ThreadingHTTPServer):
@@ -90,6 +90,9 @@ class Handler(BaseHTTPRequestHandler):
                 result = capture(config, source, title, body)
             elif self.path == "/edit-request":
                 result = edit_request(config, source, title, body)
+            elif self.path == "/write":
+                route = str(data.get("route", ""))
+                result = write_route(config, source, route, title, body)
             else:
                 self.send_json(HTTPStatus.NOT_FOUND, {"status": "error", "error": "not found"})
                 return

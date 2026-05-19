@@ -13,7 +13,7 @@ Usage:
 
 Examples:
   ./client-install.sh install \
-    --url http://100.113.147.117:8787 \
+    --url http://SERVER_TAILSCALE_IP:8787 \
     --token paste-token-here
 
   ./client-install.sh status
