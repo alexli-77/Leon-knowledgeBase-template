@@ -68,6 +68,22 @@ For a macOS server, the simplest path is the installer:
 
 `install` creates/updates the private env file, launchd service, runtime directories, and Hermes skill when Hermes is installed. `client-config` prints the URL and bearer token needed by a remote macOS Shortcut.
 
+For a remote macOS client, use the client installer:
+
+```bash
+./optional/vault-gate/client-install.sh install \
+  --url http://SERVER_TAILSCALE_IP:8787 \
+  --token PASTE_TOKEN_FROM_SERVER
+```
+
+After that, the remote Mac can send notes with:
+
+```bash
+vault-capture "Idea title" "Markdown body"
+echo "Markdown body" | vault-capture "Idea title"
+vault-edit-request "Please reorganize notes about X"
+```
+
 Manual setup is also possible:
 
 Copy `.env.example` to a private path outside this repo, for example:
