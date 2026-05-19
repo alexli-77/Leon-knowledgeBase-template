@@ -138,28 +138,43 @@ def write_unique(path: Path, content: str, dry_run: bool) -> None:
     path.write_text(content, encoding="utf-8")
 
 
-def append_log(config: GateConfig, event: dict[str, Any], dry_run: bool) -> None:
+def append_log(config: GateConfig, event: dict[str, Any], dry_run: bool) -> str | None:
     log_dir = safe_join(config.root, config.log_dir)
     month = now_utc().strftime("%Y-%m")
     log_path = log_dir / f"{month}.md"
     line = json.dumps(event, ensure_ascii=False, sort_keys=True)
     entry = f"\n- `{now_utc().isoformat(timespec='seconds')}` `{event['run_id']}` `{event['decision']}` `{event.get('path')}`\n  ```json\n  {line}\n  ```\n"
     if dry_run:
-        return
+        return None
     log_dir.mkdir(parents=True, exist_ok=True)
     if not log_path.exists():
         log_path.write_text(f"# Vault Gate automation log {month}\n", encoding="utf-8")
     with log_path.open("a", encoding="utf-8") as handle:
         handle.write(entry)
+    return relative_to_root(log_path, config.root)
 
 
-def git_commit(config: GateConfig, message: str, dry_run: bool) -> str | None:
+def git_root(config: GateConfig) -> Path | None:
+    try:
+        output = subprocess.check_output(
+            ["git", "-C", str(config.root), "rev-parse", "--show-toplevel"],
+            stderr=subprocess.DEVNULL,
+            text=True,
+        )
+        return Path(output.strip())
+    except subprocess.CalledProcessError:
+        return None
+
+
+def git_commit(config: GateConfig, message: str, dry_run: bool, paths: list[str]) -> str | None:
     if dry_run or not config.auto_commit:
         return None
-    if not (config.root / ".git").exists():
+    repo = git_root(config)
+    if repo is None:
         return None
-    subprocess.run(["git", "add", "."], cwd=config.root, check=True)
-    status = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=config.root)
+    absolute_paths = [str(safe_join(config.root, path)) for path in paths]
+    subprocess.run(["git", "add", *absolute_paths], cwd=repo, check=True)
+    status = subprocess.run(["git", "diff", "--cached", "--quiet", "--", *absolute_paths], cwd=repo)
     if status.returncode == 0:
         return None
     name = config.author.split("<")[0].strip() or "Vault Gate"
@@ -176,11 +191,11 @@ def git_commit(config: GateConfig, message: str, dry_run: bool) -> str | None:
             "-m",
             message,
         ],
-        cwd=config.root,
+        cwd=repo,
         check=True,
         stdout=subprocess.DEVNULL,
     )
-    rev = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=config.root, text=True)
+    rev = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=repo, text=True)
     return rev.strip()
 
 
@@ -198,8 +213,9 @@ def capture(config: GateConfig, source: str, title: str, body: str, dry_run: boo
     write_unique(target, content, dry_run)
 
     event = {"run_id": run_id, "decision": "captured", "source": source, "path": rel, "dry_run": dry_run}
-    append_log(config, event, dry_run)
-    commit = git_commit(config, f"vault-gate: capture {run_id}", dry_run)
+    log_rel = append_log(config, event, dry_run)
+    commit_paths = [rel] + ([log_rel] if log_rel else [])
+    commit = git_commit(config, f"vault-gate: capture {run_id}", dry_run, commit_paths)
     return GateResult("ok", "captured", rel, run_id, commit)
 
 
@@ -217,8 +233,9 @@ def edit_request(config: GateConfig, source: str, title: str, body: str, dry_run
     write_unique(target, content, dry_run)
 
     event = {"run_id": run_id, "decision": "pending-review", "source": source, "path": rel, "dry_run": dry_run}
-    append_log(config, event, dry_run)
-    commit = git_commit(config, f"vault-gate: pending review {run_id}", dry_run)
+    log_rel = append_log(config, event, dry_run)
+    commit_paths = [rel] + ([log_rel] if log_rel else [])
+    commit = git_commit(config, f"vault-gate: pending review {run_id}", dry_run, commit_paths)
     return GateResult("ok", "pending-review", rel, run_id, commit)
 
 
