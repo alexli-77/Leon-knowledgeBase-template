@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>local.vault-snapshot</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>__APP_DIR__/collect_snapshot.py</string>
+  </array>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>VAULT_ROOT</key>
+    <string>__VAULT_ROOT__</string>
+  </dict>
+
+  <key>StartInterval</key>
+  <integer>3600</integer>
+
+  <key>StandardOutPath</key>
+  <string>__LOG_DIR__/launchd.out.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>__LOG_DIR__/launchd.err.log</string>
+</dict>
+</plist>

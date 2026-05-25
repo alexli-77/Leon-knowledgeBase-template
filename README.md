@@ -140,6 +140,19 @@ optional/vault-gate/
 
 详见 `optional/vault-gate/README.md`。
 
+## 可选：Snapshot Collector
+
+如果你希望定时把工作机上的轻量上下文写入 vault，可以启用：
+
+```text
+optional/snapshot-collector/
+```
+
+它每小时收集一次浏览器标签、可见 app、Codex / Claude 最近文件索引和基础系统信息，
+写入 `_snapshots/daily/...` 与 `_snapshots/latest`。脚本不复制 raw chat log、cookie、token 或浏览器数据库。
+
+详见 `optional/snapshot-collector/README.md`。
+
 ## License
 
 MIT。随便用、改、分发。

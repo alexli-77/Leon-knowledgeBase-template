@@ -12,6 +12,9 @@ optional/vault-gate/**/*.log
 optional/vault-gate/**/runs/
 optional/vault-gate/**/secrets/
 optional/vault-gate/**/__pycache__/
+optional/snapshot-collector/**/*.log
+optional/snapshot-collector/**/__pycache__/
+_snapshots/
 
 # === 用户私人内容：模板本身不应含这些；fork 后写在这的内容也不会被 push ===
 # 如果你在 clone 下来的 repo 里直接写笔记（不推荐，建议 setup.sh 部署到别处）
