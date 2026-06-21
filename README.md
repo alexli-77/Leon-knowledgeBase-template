@@ -1,5 +1,9 @@
 # Leon Knowledge Base Template
 
+<p align="center">
+  <img src="docs/assets/leon-knowledgebase-template-banner.png" alt="Leon KnowledgeBase Template" width="700">
+</p>
+
 一个基于 **Obsidian + Claude Code** 的个人知识库模板。
 PARA 变体 + 数字前缀 + MOC 文件 + 路由规则 + `/record` skill，让"把东西记下来"变成一句指令。
 
